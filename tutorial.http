@@ -137,3 +137,95 @@ username=john&password=password&age=12
 GET http://127.0.0.1:8000/get_item_or_errror/floo
 Content-Type: application/x-www-form-urlencoded
 
+
+# json encode 
+
+###
+PUT http://127.0.0.1:8000/json_items/foo
+
+{
+    "title": "Foo",
+    "timestamp": "{{$timestamp}}"
+}
+
+# body update 
+
+###
+GET http://127.0.0.1:8000/get_json_item/baz
+
+###
+PUT http://127.0.0.1:8000/get_json_item/baz
+
+{
+  "name": "fill",
+  "description": null,
+  "price": 50.2
+}
+
+
+# function dependency injection 
+
+###
+GET http://127.0.0.1:8000/depend_items/?q=boo&skip=10&limit=10
+
+###
+GET http://127.0.0.1:8000/depend_users/?q=loo&skip=5&limit=20
+
+
+# class dependency injection 
+
+###
+GET http://127.0.0.1:8000/class_depend_items/?q=class_boo&skip=10&limit=10
+
+###
+GET http://127.0.0.1:8000/class_depend_users/?q=class_loo&skip=5&limit=20
+
+
+# nested dependency injection 
+
+###
+GET http://127.0.0.1:8000/nested_injections/?q=show
+Cookie: ads_id=12
+
+
+# passing dependency into the path decorator 
+
+###
+GET  http://127.0.0.1:8000/dependencies_items/
+x-token: fake-super-secret-token
+x-key: fake-super-secret-key
+
+
+# Authentication 
+###
+GET http://127.0.0.1:8000/users/me
+
+
+# Auth login 
+
+###
+POST http://127.0.0.1:8000/token
+Content-Type: application/x-www-form-urlencoded
+
+username=johndoe
+&password=secret
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
