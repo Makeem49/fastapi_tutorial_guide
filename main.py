@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import (
     FastAPI,
     Query,
@@ -9,8 +11,10 @@ from fastapi import (
     Form,
     File,
     UploadFile,
-    HTTPException
+    HTTPException,
+    Depends
 )
+from fastapi.encoders import jsonable_encoder
 from enum import Enum
 from typing import Union, Set, List
 from pydantic import BaseModel, Field,  EmailStr
@@ -336,3 +340,134 @@ async def read_item(item_id: str):
 
 
 # JSON COMPATIBLE ENCODER
+
+
+class JsonItem(BaseModel):
+    title: str
+    timestamp: datetime
+    description: Union[str, None] = None
+
+
+fake_db = {}
+
+
+@app.put("/json_items/{id}")
+def json_items(id: str, item: JsonItem):
+    """json_encoder function will convert the input data to json compatible format"""
+    print(item.dict())
+    json_compatible_item_data = jsonable_encoder(item)
+    print(json_compatible_item_data)
+    fake_db[id] = json_compatible_item_data
+
+    return fake_db
+
+
+# BODY UPDATE
+
+items = {
+    "foo": {"name": "Foo", "price": 50.2},
+    "bar": {"name": "Bar", "description": "The bartenders", "price": 62, "tax": 20.2},
+    "baz": {"name": "Baz", "description": None, "price": 50.2, "tax": 10.5, "tags": []},
+}
+
+
+@app.get("/get_json_item/{item_id}", response_model=Item)
+async def get_json_item(item_id: str):
+    return items[item_id]
+
+
+@app.put("/get_json_item/{item_id}", response_model=Item)
+async def update_item(item_id: str, item: Item):
+    saved_data = items[item_id]
+    stored_model = Item(**saved_data)
+    data_to_save_for_update = item.dict(exclude_unset=True)
+    update_data = stored_model.copy(update=data_to_save_for_update)
+    update_item_encoded = jsonable_encoder(update_data)
+    items[item_id] = update_item_encoded
+    return update_item_encoded
+
+
+# FUNCTION  DEPENDENCY INJECTION
+
+async def common_parameters(
+    q: Union[str, None] = None, skip: int = 0, limit: int = 100
+):
+    return {"q": q, "skip": skip, "limit": limit}
+
+
+@app.get("/depend_items/", tags=['function_dependency'])
+async def read_items(commons: dict = Depends(common_parameters)):
+    print(commons)
+    return commons
+
+
+@app.get("/depend_users/", tags=['function_dependency'])
+async def read_users(commons: dict = Depends(common_parameters)):
+    return commons
+
+
+# CLASS  DEPENDENCY INJECTION
+
+
+class CommonQueryParams:
+    def __init__(self, q: Union[str, None] = None, skip: int = 0, limit: int = 100):
+        self.q = q
+        self.skip = skip
+        self.limit = limit
+
+
+@app.get("/class_depend_items/", tags=['class_dependency'])
+async def read_items(commons: CommonQueryParams = Depends(CommonQueryParams)):
+    return commons
+
+
+@app.get("/class_depend_users/", tags=['class_dependency'])
+async def read_users(commons: CommonQueryParams = Depends(CommonQueryParams)):
+    return commons
+
+
+# NESTED DEPENDENCY INJECTION
+
+def query_extractor(q: Union[str, None] = None):
+    """This function run first"""
+    return q
+
+
+def query_or_cookie_extractor(
+    q: str = Depends(query_extractor),
+    last_query: Union[str, None] = Cookie(default=None),
+):
+    """The query_extractor is called inside query_or_cookie_extractor and the 
+    value is returned to q 
+    """
+    if not q:
+        return last_query
+    return q
+
+
+@app.get("/nested_injections/")
+async def read_query(query_or_default: str = Depends(query_or_cookie_extractor)):
+    """The query_or_cookie_extractor is now called inside the read query function in which the result 
+    is saved to query_or_default
+    """
+    return {"q_or_cookie": query_or_default}
+
+
+# PASSING DEPENDENCY INSIDE THE PATH DECORATOR
+
+async def verify_token(x_token: str = Header()):
+    if x_token != "fake-super-secret-token":
+        raise HTTPException(status_code=400, detail="X-Token header invalid")
+
+
+async def verify_key(x_key: str = Header()):
+    if x_key != "fake-super-secret-key":
+        raise HTTPException(status_code=400, detail="X-Key header invalid")
+    return x_key
+
+
+@app.get("/dependencies_items/", dependencies=[Depends(verify_token), Depends(verify_key)])
+async def read_items():
+    return [{"item": "Foo"}, {"item": "Bar"}]
+
+
