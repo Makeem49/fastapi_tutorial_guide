@@ -1,0 +1,30 @@
+# CRUD ENDPOINTS
+
+# create user endpoint 
+###
+POST http://127.0.0.1:8000/users/
+
+{
+    "email" : "joker@gmail.com",
+    "password" : "password"
+}
+
+# get users endpoint 
+###
+GET http://127.0.0.1:8000/users/
+
+
+# create item for a particular users endpoint 
+###
+POST http://127.0.0.1:8000/users/2/items
+
+{
+    "title" : "Chips 32",
+    "descripton" : "lorem losion epsum"
+}
+
+
+# get items endpoint 
+###
+GET http://127.0.0.1:8000/items/
+
