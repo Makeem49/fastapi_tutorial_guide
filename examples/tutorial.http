@@ -1,0 +1,241 @@
+
+# basic root 
+http://127.0.0.1:8000
+
+
+# path paramters
+### integer parameter 
+http://127.0.0.1:8000/items/1
+
+### fixed parameters 
+http://127.0.0.1:8000/models/lenet
+
+### query parameters 
+http://127.0.0.1:8000/items/
+
+
+### query and path parameters 
+http://127.0.0.1:8000/product/1?short=True&q=show
+
+### sending a body 
+POST http://127.0.0.1:8000/items/
+
+{
+    "name": "Foo",
+    "price": 45.2
+}
+
+### sending a body 
+PUT http://127.0.0.1:8000/items/1?q=true
+
+{
+    "name": "Foo",
+    "price": 45.2
+}
+
+### query parameters and string validation  
+http://127.0.0.1:8000/query_valid/?q=jdoi
+
+
+### path parameters and string validation  
+http://127.0.0.1:8000/path_valid/1?q=jdoi
+
+
+### sending bodies and path param  
+PUT http://127.0.0.1:8000/combine_items/1?q=true
+
+{
+    "item": {
+        "name": "Foo",
+        "description": "The pretender",
+        "price": 42.0,
+        "tax": 3.2
+    },
+    "user": {
+        "username": "dave",
+        "full_name": "Dave Grohl"
+    }, 
+    "importance" : 3
+}
+
+### sending bodies and path param  
+PUT http://127.0.0.1:8000/nested_items/1
+
+{
+    "name": "Foo",
+    "description": "The pretender",
+    "price": 42.0,
+    "tax": 3.2,
+    "tags": ["rock", "metal", "bar"],
+    "image": {
+        "url": "http://example.com/baz.jpg",
+        "name": "The Foo live"
+    }
+}
+
+# read cookies 
+
+### 
+GET http://127.0.0.1:8000/get_cookie
+Cookie: ads_id=12
+
+# read headers   
+
+### 
+GET http://127.0.0.1:8000/get_heaers
+Content-Type: application/javascript
+
+
+# reponse model 
+
+### 
+POST http://127.0.0.1:8000/single_item/
+
+{
+    "name": "Foo",
+    "price": 45.2
+}
+
+### 
+GET http://127.0.0.1:8000/list_items/
+
+{
+    "name": "Foo",
+    "price": 45.2
+}
+
+### 
+POST http://127.0.0.1:8000/user/
+
+{
+    "username": "Foo",
+    "password": 45.2,
+    "email" :  "foo@gmail.com",
+    "full_name" : "John  doe"
+}
+
+### 
+GET http://127.0.0.1:8000/get_item/baz
+
+
+# list of models 
+
+### 
+GET http://127.0.0.1:8000/get_description/
+
+
+# send form data
+###
+POST http://127.0.0.1:8000/login/
+Content-Type: application/x-www-form-urlencoded
+
+username=john&password=password&age=12
+
+# eception  handling 
+
+###
+GET http://127.0.0.1:8000/get_item_or_errror/floo
+Content-Type: application/x-www-form-urlencoded
+
+
+# json encode 
+
+###
+PUT http://127.0.0.1:8000/json_items/foo
+
+{
+    "title": "Foo",
+    "timestamp": "{{$timestamp}}"
+}
+
+# body update 
+
+###
+GET http://127.0.0.1:8000/get_json_item/baz
+
+###
+PUT http://127.0.0.1:8000/get_json_item/baz
+
+{
+  "name": "fill",
+  "description": null,
+  "price": 50.2
+}
+
+
+# function dependency injection 
+
+###
+GET http://127.0.0.1:8000/depend_items/?q=boo&skip=10&limit=10
+
+###
+GET http://127.0.0.1:8000/depend_users/?q=loo&skip=5&limit=20
+
+
+# class dependency injection 
+
+###
+GET http://127.0.0.1:8000/class_depend_items/?q=class_boo&skip=10&limit=10
+
+###
+GET http://127.0.0.1:8000/class_depend_users/?q=class_loo&skip=5&limit=20
+
+
+# nested dependency injection 
+
+###
+GET http://127.0.0.1:8000/nested_injections/?q=show
+Cookie: ads_id=12
+
+
+# passing dependency into the path decorator 
+
+###
+GET  http://127.0.0.1:8000/dependencies_items/
+x-token: fake-super-secret-token
+x-key: fake-super-secret-key
+
+
+# Authentication 
+###
+GET http://127.0.0.1:8000/users/me
+
+
+# Auth login 
+
+###
+POST http://127.0.0.1:8000/token
+Content-Type: application/x-www-form-urlencoded
+
+username=johndoe
+&password=secret
+
+
+###
+GET http://127.0.0.1:8000/users/me
+Content-Type: application/application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huZG9lIiwiZXhwIjoxNjc0MDQyODA5fQ.9lzve4O75sPdRBIxcDU4OUB52CnTfO27q15jaLDgrqs
+
+
+# middleware 
+
+###
+GET http://127.0.0.1:8000/items
+
+# cors request 
+
+###
+GET http://127.0.0.1:8000/
+
+
+
+
+
+
+
+
+
+
+
+
+
